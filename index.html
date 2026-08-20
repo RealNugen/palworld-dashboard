@@ -1,130 +1,48 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NUGENS SERVER - Dashboard</title>
-    <style>
-       .copy-address {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #111;
-  padding: 10px 14px;
-  border: 1px solid #00ff66;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.copy-address:hover {
-  background-color: #1a2e1a;
-}
-
-.copy-address code {
-  color: #00ff66;
-  font-family: monospace;
-  font-size: 1.05rem;
-}
-
-.copy-hint {
-  font-size: 0.8rem;
-  color: #888;
-  margin-left: 10px;
-}
-
-.copy-address.copied {
-  border-color: #ffffff;
-} 
-       * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Courier New', Courier, monospace; }
-        body { background-color: #0a0a0a; color: #e0e0e0; padding: 20px; }
-        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #333; padding-bottom: 15px; margin-bottom: 30px; position: relative; }
-        h1 { font-size: 1.8rem; letter-spacing: 2px; text-transform: uppercase; }
-        .menu-button { background: #111; color: #fff; border: 1px solid #444; padding: 8px 16px; cursor: pointer; font-weight: bold; letter-spacing: 1px; }
-        .menu-button:hover { background: #222; border-color: #666; }
-        .menu-nav { display: none; position: absolute; top: 100%; right: 0; width: 320px; background-color: #121212; border: 1px solid #333; box-shadow: 0 10px 25px rgba(0,0,0,0.8); padding: 15px; margin-top: 10px; z-index: 100; }
-        .menu-nav.active { display: block; }
-        .menu-section h3 { font-size: 1rem; color: #4af626; border-bottom: 1px solid #333; padding-bottom: 5px; margin-bottom: 10px; text-transform: uppercase; }
-        .menu-section p { font-size: 0.85rem; line-height: 1.4; margin-bottom: 12px; color: #ccc; }
-        .menu-section code { background: #222; color: #4af626; padding: 2px 6px; border-radius: 3px; display: inline-block; margin-top: 3px; }
-        .dashboard-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
-        .status-card { background: #111; border: 1px solid #222; padding: 15px; border-radius: 4px; }
-        .status-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; padding-bottom: 10px; margin-bottom: 15px; }
-        .live-badge { background: #00ff6622; color: #00ff66; border: 1px solid #00ff66; font-size: 0.7rem; padding: 2px 6px; border-radius: 2px; }
-        .metric-box { margin-bottom: 12px; }
-        .metric-title { font-size: 0.75rem; color: #777; text-transform: uppercase; margin-bottom: 4px; }
-        .metric-value { font-size: 1.1rem; font-weight: bold; }
-        .footer-info { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #333; font-size: 0.75rem; color: #666; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nugens Server Dashboard</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <header>
+    <h1>NUGENS SERVER</h1>
+    <button id="menu-btn">≡ MENU</button>
+  </header>
 
-    <header>
-        <h1>NUGENS SERVER</h1>
-        <button id="menu-btn" class="menu-button">≡ MENU</button>
+  <!-- Das Klappmenü für Palworld -->
+  <div id="menu-box" class="server-info-box hidden">
+    <h3>PALWORLD SERVER INFO</h3>
+    <p>Klicke auf die Adresse zum Kopieren:</p>
+    <div class="copy-address" onclick="copyToClipboard('realnugen.duckdns.org:8211', this)">
+      <code>realnugen.duckdns.org:8211</code>
+      <span class="copy-hint">Kopieren</span>
+    </div>
+  </div>
 
-        <div id="dropdown-menu" class="menu-nav">
-            <div class="menu-section">
-                <h3>Palworld Server Info</h3>
-                <p>
-                    <strong>Zu Hause (im selben WLAN/Heimnetz):</strong><br>
-                    Nutze die lokale IP:<br>
-                    <code>192.168.178.35:8211</code><br>
-                    <small style="color: #888;">Das liefert die stabilste und schnellste Verbindung ohne Umwege.</small>
-                </p>
-                <p>
-                    <strong>Unterwegs / Für Freunde (außerhalb deines Netzes):</strong><br>
-                    Nutzt die DynDNS-Adresse:<br>
-                    <code>realnugen.duckdns.org:8211</code>
-                </p>
-            </div>
-        </div>
-    </header>
+  <main>
+    <div class="card">
+      <div class="card-header">
+        <span id="status-text">PS C:\SYSTEM> CONNECTING...</span>
+        <span class="badge">• LIVE</span>
+      </div>
+      <div class="metrics">
+        <div><label>SYSTEM UPTIME</label><p id="uptime">--</p></div>
+        <div><label>SYSTEM LOAD</label><p id="load">--</p></div>
+        <div><label>DISK USAGE (/)</label><p id="disk">--</p></div>
+        <div><label>MEMORY USAGE</label><p id="memory">--</p></div>
+        <div><label>TEMPERATURE</label><p id="temp">-- °C</p></div>
+        <div><label>PROCESSES</label><p id="processes">--</p></div>
+      </div>
+      <div class="footer-info">
+        Users logged in: <span id="users-logged">0</span><br>
+        IPv4 address (wlp3s0): 192.168.178.35
+      </div>
+    </div>
+  </main>
 
-    <main class="dashboard-grid">
-        <aside class="status-card">
-            <div class="status-header">
-                <span id="connection-status" style="font-size: 0.8rem; font-weight: bold;">PS C:\SYSTEM> CONNECTING...</span>
-                <span class="live-badge">• LIVE</span>
-            </div>
-
-            <div class="metric-box">
-                <div class="metric-title">System Uptime</div>
-                <div class="metric-value" id="system-uptime">--</div>
-            </div>
-
-            <div class="metric-box">
-                <div class="metric-title">System Load</div>
-                <div class="metric-value" id="system-load">0.00</div>
-            </div>
-
-            <div class="metric-box">
-                <div class="metric-title">Disk Usage (/)</div>
-                <div class="metric-value" id="disk-usage">0 GB</div>
-            </div>
-
-            <div class="metric-box">
-                <div class="metric-title">Memory Usage</div>
-                <div class="metric-value" id="memory-usage">0 GB</div>
-            </div>
-
-            <div class="metric-box">
-                <div class="metric-title">Temperature</div>
-                <div class="metric-value" id="temperature">-- °C</div>
-            </div>
-
-            <div class="metric-box">
-                <div class="metric-title">Processes</div>
-                <div class="metric-value" id="processes">0</div>
-            </div>
-
-            <div class="footer-info">
-                Users logged in: <span id="users-count">0</span><br>
-                IPv4 address (wlp3s0): <span id="ip-address" style="background: #003366; color: #fff; padding: 0 4px;">192.168.178.35</span>
-            </div>
-        </aside>
-    </main>
-
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
