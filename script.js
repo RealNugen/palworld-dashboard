@@ -1,5 +1,7 @@
 // Funktion zum Abrufen der Server-Daten von der Flask-API
 async function fetchStats() {
+  const statusText = document.getElementById('status-text');
+  
   try {
     const response = await fetch('https://enviably-saturday-barrette.ngrok-free.dev/api/stats', {
       headers: {
@@ -11,23 +13,35 @@ async function fetchStats() {
 
     const data = await response.json();
 
-    // DOM-Elemente befüllen
-    document.getElementById('uptime').innerText = data.uptime || '--';
-    document.getElementById('load').innerText = data.load || '--';
-    document.getElementById('disk').innerText = data.disk || '--';
-    document.getElementById('memory').innerText = data.memory || '--';
-    document.getElementById('temp').innerText = data.temp ? `${data.temp} °C` : '-- °C';
-    document.getElementById('processes').innerText = data.processes || '--';
+    // DOM-Elemente sicher befüllen
+    const uptimeEl = document.getElementById('uptime');
+    if (uptimeEl) uptimeEl.innerText = data.uptime || '--';
+
+    const loadEl = document.getElementById('load');
+    if (loadEl) loadEl.innerText = data.load || '--';
+
+    const diskEl = document.getElementById('disk');
+    if (diskEl) diskEl.innerText = data.disk || '--';
+
+    const memoryEl = document.getElementById('memory');
+    if (memoryEl) memoryEl.innerText = data.memory || '--';
+
+    const tempEl = document.getElementById('temp');
+    if (tempEl) tempEl.innerText = data.temp ? `${data.temp} °C` : '-- °C';
+
+    const processesEl = document.getElementById('processes');
+    if (processesEl) processesEl.innerText = data.processes || '--';
+
+    const usersEl = document.getElementById('users-logged');
+    if (usersEl) usersEl.innerText = data.users || '0';
 
     // Status-Indikator auf ONLINE setzen
-    const statusText = document.getElementById('status-text');
     if (statusText) {
       statusText.innerText = 'PS C:\\SYSTEM> ONLINE';
       statusText.style.color = '#00ff66';
     }
   } catch (error) {
     console.error('Fetch failure:', error);
-    const statusText = document.getElementById('status-text');
     if (statusText) {
       statusText.innerText = 'PS C:\\SYSTEM> OFFLINE // CONNECTION ERROR';
       statusText.style.color = '#ff3333';
