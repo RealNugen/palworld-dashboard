@@ -1,62 +1,70 @@
+// Funktion zum Abrufen der Server-Daten von der Flask-API
+async function fetchStats() {
+  try {
+    const response = await fetch('https://enviably-saturday-barrette.ngrok-free.dev/api/stats', {
+      headers: {
+        'ngrok-skip-browser-warning': 'true'
+      }
+    });
+
+    if (!response.ok) throw new Error('Netzwerk-Antwort war nicht ok');
+
+    const data = await response.json();
+
+    // DOM-Elemente befüllen
+    document.getElementById('uptime').innerText = data.uptime || '--';
+    document.getElementById('load').innerText = data.load || '--';
+    document.getElementById('disk').innerText = data.disk || '--';
+    document.getElementById('memory').innerText = data.memory || '--';
+    document.getElementById('temp').innerText = data.temp ? `${data.temp} °C` : '-- °C';
+    document.getElementById('processes').innerText = data.processes || '--';
+
+    // Status-Indikator auf ONLINE setzen
+    const statusText = document.getElementById('status-text');
+    if (statusText) {
+      statusText.innerText = 'PS C:\\SYSTEM> ONLINE';
+      statusText.style.color = '#00ff66';
+    }
+  } catch (error) {
+    console.error('Fetch failure:', error);
+    const statusText = document.getElementById('status-text');
+    if (statusText) {
+      statusText.innerText = 'PS C:\\SYSTEM> OFFLINE // CONNECTION ERROR';
+      statusText.style.color = '#ff3333';
+    }
+  }
+}
+
+// Click-to-Copy Funktion für die Serveradresse im Menü
+function copyToClipboard(text, element) {
+  navigator.clipboard.writeText(text).then(() => {
+    const hint = element.querySelector('.copy-hint');
+    const originalText = hint ? hint.innerText : '';
+
+    if (hint) hint.innerText = 'Kopiert!';
+    element.classList.add('copied');
+
+    setTimeout(() => {
+      if (hint) hint.innerText = originalText;
+      element.classList.remove('copied');
+    }, 2000);
+  }).catch(err => {
+    console.error('Fehler beim Kopieren: ', err);
+  });
+}
+
+// Menü Toggle Logik
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Menü-Toggle Logik
-    const menuButton = document.getElementById('menu-btn') || document.querySelector('.menu-button');
-    const menuNav = document.getElementById('dropdown-menu') || document.querySelector('.menu-nav');
+  const menuBtn = document.getElementById('menu-btn');
+  const menuBox = document.getElementById('menu-box');
 
-    if (menuButton && menuNav) {
-        menuButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            menuNav.classList.toggle('active');
-        });
+  if (menuBtn && menuBox) {
+    menuBtn.addEventListener('click', () => {
+      menuBox.classList.toggle('hidden');
+    });
+  }
 
-        document.addEventListener('click', (e) => {
-            if (!menuNav.contains(e.target) && !menuButton.contains(e.target)) {
-                menuNav.classList.remove('active');
-            }
-        });
-    }
-
-    // 2. API-Fetch Logik
-    async function fetchStats() {
-        const statusElement = document.getElementById('connection-status');
-        
-        try {
-            const response = await fetch('https://enviably-saturday-barrette.ngrok-free.dev/api/stats', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'ngrok-skip-browser-warning': 'true'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            if (document.getElementById('system-uptime')) document.getElementById('system-uptime').innerText = data.uptime || '--';
-            if (document.getElementById('system-load')) document.getElementById('system-load').innerText = data.load || '0.00';
-            if (document.getElementById('disk-usage')) document.getElementById('disk-usage').innerText = data.disk || '0 GB';
-            if (document.getElementById('memory-usage')) document.getElementById('memory-usage').innerText = data.memory || '0 GB';
-            if (document.getElementById('temperature')) document.getElementById('temperature').innerText = data.temp ? `${data.temp} °C` : '-- °C';
-            if (document.getElementById('processes')) document.getElementById('processes').innerText = data.processes || '0';
-            if (document.getElementById('users-count')) document.getElementById('users-count').innerText = data.users || '0';
-
-            if (statusElement) {
-                statusElement.innerText = "PS C:\\SYSTEM> ONLINE";
-                statusElement.style.color = "#00ff66";
-            }
-
-        } catch (error) {
-            console.error('Fetch failure:', error);
-            if (statusElement) {
-                statusElement.innerText = "PS C:\\SYSTEM> OFFLINE // CONNECTION ERROR";
-                statusElement.style.color = "#ff3333";
-            }
-        }
-    }
-
-    fetchStats();
-    setInterval(fetchStats, 5000);
+  // Ersten Fetch ausführen & Intervall auf 5 Sekunden setzen
+  fetchStats();
+  setInterval(fetchStats, 5000);
 });
