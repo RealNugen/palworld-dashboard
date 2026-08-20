@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palworld Server Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0f172a; color: #f8fafc; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background-color: #1e293b; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.5); max-width: 480px; width: 100%; text-align: center; border: 1px solid #334155; }
+        h1 { margin-top: 0; color: #38bdf8; font-size: 1.75rem; }
+        .status-badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: bold; font-size: 0.875rem; margin-bottom: 1.5rem; }
+        .online { background-color: #059669; color: #ecfdf5; }
+        .offline { background-color: #dc2626; color: #fef2f2; }
+        .stat-box { background-color: #0f172a; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem; border: 1px solid #334155; }
+        .stat-label { font-size: 0.875rem; color: #94a3b8; }
+        .stat-value { font-size: 1.25rem; font-weight: bold; color: #f1f5f9; }
+        .address-box { background-color: #0284c7; color: white; padding: 0.75rem; border-radius: 0.5rem; font-family: monospace; font-size: 1.1rem; word-break: break-all; margin-top: 1rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Palworld Server</h1>
+        <div id="status" class="status-badge offline">Prüfe Status...</div>
+        
+        <div class="stat-box">
+            <div class="stat-label">Spieler Online</div>
+            <div id="players" class="stat-value">- / 8</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="stat-label">Server Version</div>
+            <div id="version" class="stat-value">-</div>
+        </div>
+
+        <div class="stat-label" style="margin-top: 1.5rem;">Server-Adresse für Palworld:</div>
+        <div class="address-box" onclick="navigator.clipboard.writeText('llksomifrgtdfp0r.myfritz.net:8211'); alert('Adresse kopiert!');">
+            llksomifrgtdfp0r.myfritz.net:8211
+        </div>
+        <p style="font-size: 0.75rem; color: #64748b; margin-top: 0.5rem;">(Anklicken zum Kopieren)</p>
+    </div>
+
+    <script>
+        async function fetchStats() {
+            try {
+                // REST API Aufruf an den Palworld Docker Container
+                const response = await fetch('http://' + window.location.hostname + ':8212/v1/api/info', {
+                    headers: { 'Authorization': 'Basic ' + btoa('admin:MeinAdminPasswort123') }
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('status').innerText = 'Online';
+                    document.getElementById('status').className = 'status-badge online';
+                    document.getElementById('version').innerText = data.version || 'Aktiv';
+                } else {
+                    throw new Error();
+                }
+            } catch (e) {
+                document.getElementById('status').innerText = 'Offline / Lädt...';
+                document.getElementById('status').className = 'status-badge offline';
+            }
+        }
+        fetchStats();
+        setInterval(fetchStats, 30000);
+    </script>
+</body>
+</html>

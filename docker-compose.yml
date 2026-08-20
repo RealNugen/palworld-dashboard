@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  dashboard-web:
+    image: nginx:alpine
+    container_name: palworld-dashboard
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+
+networks:
+  default:
+    name: palworld-network
