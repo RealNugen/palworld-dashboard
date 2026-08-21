@@ -2,7 +2,7 @@
 async function fetchStats() {
   const statusText = document.getElementById('status-text');
   try {
-    const response = await fetch('https://enviably-saturday-barrette.ngrok-free.dev/api/stats', {
+    const response = await fetch('http://realnugen.duckdns.org:5000/api/stats', {
       headers: { 'ngrok-skip-browser-warning': 'true' }
     });
     if (!response.ok) throw new Error('Network error');
