@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HomeOS Hub</title>
+    <title>Nugens in Paris</title>
     <style>
         :root {
             --bg-color: #000000;
@@ -40,14 +40,13 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Main Shell Layout */
         .app-shell {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 300px 1fr;
             gap: 1.5rem;
-            max-width: 1100px;
+            max-width: 1150px;
             width: 100%;
-            min-height: 620px;
+            min-height: 650px;
             background: rgba(20, 20, 22, 0.6);
             backdrop-filter: blur(var(--blur-amount));
             -webkit-backdrop-filter: blur(var(--blur-amount));
@@ -57,7 +56,6 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
-        /* Sidebar Links */
         .sidebar {
             background: var(--sidebar-bg);
             border-right: 1px solid var(--card-border);
@@ -71,10 +69,7 @@
             font-size: 1.2rem;
             font-weight: 700;
             letter-spacing: -0.02em;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            margin-bottom: 1.5rem;
         }
 
         .status-pill {
@@ -99,7 +94,7 @@
         }
 
         .sidebar-section {
-            margin-top: 1.5rem;
+            margin-top: 1.25rem;
         }
 
         .sidebar-title {
@@ -107,14 +102,14 @@
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: var(--text-secondary);
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.6rem;
             font-weight: 600;
         }
 
         .info-list {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.5rem;
             font-size: 0.85rem;
         }
 
@@ -130,7 +125,6 @@
             font-family: SFMono-Regular, Consolas, monospace;
         }
 
-        /* Main Content Rechts */
         .content {
             padding: 2rem;
             display: flex;
@@ -145,7 +139,6 @@
             color: var(--text-primary);
         }
 
-        /* Services Grid */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -172,21 +165,10 @@
             border-color: rgba(255, 255, 255, 0.25);
         }
 
-        .card-icon {
-            font-size: 1.8rem;
-        }
+        .card-icon { font-size: 1.8rem; }
+        .card-title { font-size: 1rem; font-weight: 600; }
+        .card-sub { font-size: 0.8rem; color: var(--text-secondary); }
 
-        .card-title {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .card-sub {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
-        /* Palworld Banner / Card */
         .pal-card {
             background: linear-gradient(135deg, rgba(41, 151, 255, 0.1), rgba(255, 255, 255, 0.03));
             border: 1px solid var(--card-border);
@@ -209,19 +191,11 @@
             transition: background 0.2s;
         }
 
-        .copy-btn:hover {
-            background: rgba(41, 151, 255, 0.35);
-        }
+        .copy-btn:hover { background: rgba(41, 151, 255, 0.35); }
 
-        /* Responsive Breakpoint */
         @media (max-width: 768px) {
-            .app-shell {
-                grid-template-columns: 1fr;
-            }
-            .sidebar {
-                border-right: none;
-                border-bottom: 1px solid var(--card-border);
-            }
+            .app-shell { grid-template-columns: 1fr; }
+            .sidebar { border-right: none; border-bottom: 1px solid var(--card-border); }
         }
     </style>
 </head>
@@ -231,51 +205,40 @@
     <!-- Links: Sidebar -->
     <div class="sidebar">
         <div>
-            <div class="brand">
-                <span> HomeOS</span>
-            </div>
+            <div class="brand"> Nugens in Paris</div>
 
-            <div style="margin-bottom: 1.5rem;">
+            <div style="margin-bottom: 1rem;">
                 <div class="status-pill">
                     <span class="status-dot"></span>
-                    <span>Server Online</span>
+                    <span id="server-status">Server Online</span>
                 </div>
             </div>
 
+            <!-- Server Performance Metrics -->
             <div class="sidebar-section">
-                <div class="sidebar-title">System Status</div>
+                <div class="sidebar-title">System Metrics</div>
                 <div class="info-list">
-                    <div class="info-item">
-                        <span>Uptime</span>
-                        <span class="info-value" id="sys-uptime">-</span>
-                    </div>
-                    <div class="info-item">
-                        <span>RAM</span>
-                        <span class="info-value" id="sys-ram">-</span>
-                    </div>
+                    <div class="info-item"><span>Uptime</span><span class="info-value" id="sys-uptime">-</span></div>
+                    <div class="info-item"><span>System Load</span><span class="info-value" id="sys-load">-</span></div>
+                    <div class="info-item"><span>Memory (RAM)</span><span class="info-value" id="sys-ram">-</span></div>
+                    <div class="info-item"><span>Disk (/)</span><span class="info-value" id="sys-disk">-</span></div>
+                    <div class="info-item"><span>Temperatur</span><span class="info-value" id="sys-temp">-</span></div>
+                    <div class="info-item"><span>Prozesse</span><span class="info-value" id="sys-procs">-</span></div>
+                    <div class="info-item"><span>Logged-in Users</span><span class="info-value" id="sys-users">-</span></div>
                 </div>
             </div>
 
+            <!-- Network Details -->
             <div class="sidebar-section">
                 <div class="sidebar-title">Netzwerk</div>
                 <div class="info-list">
-                    <div class="info-item">
-                        <span>IP</span>
-                        <span class="info-value">192.168.178.35</span>
-                    </div>
-                    <div class="info-item">
-                        <span>DNS</span>
-                        <span class="info-value">Pi-hole v6</span>
-                    </div>
-                    <div class="info-item">
-                        <span>Backups</span>
-                        <span class="info-value">Aktiv (20:00)</span>
-                    </div>
+                    <div class="info-item"><span>IPv4</span><span class="info-value">192.168.178.35</span></div>
+                    <div class="info-item"><span>DNS</span><span class="info-value">Pi-hole v6</span></div>
                 </div>
             </div>
         </div>
 
-        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2rem;">
+        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 1.5rem;">
             Ubuntu 24.04 LTS
         </div>
     </div>
@@ -285,25 +248,22 @@
         <div>
             <div class="section-header">Dienste & Control Panel</div>
             <div class="grid">
-                <!-- Pi-hole -->
                 <a href="http://192.168.178.35:8088/admin" target="_blank" class="card">
                     <div class="card-icon">🛡️</div>
                     <div>
-                        <div class="card-title">Pi-hole</div>
+                        <div class="card-title">Pi-hole v6</div>
                         <div class="card-sub">DNS & Werbefilter</div>
                     </div>
                 </a>
 
-                <!-- Vaultwarden -->
                 <a href="https://enviably-saturday-barrette.ngrok-free.dev" target="_blank" class="card">
                     <div class="card-icon">🔑</div>
                     <div>
                         <div class="card-title">Vaultwarden</div>
-                        <div class="card-sub">Passwörter</div>
+                        <div class="card-sub">Passwort-Manager</div>
                     </div>
                 </a>
 
-                <!-- Uptime Kuma -->
                 <a href="http://192.168.178.35:3001" target="_blank" class="card">
                     <div class="card-icon">📊</div>
                     <div>
@@ -314,7 +274,6 @@
             </div>
         </div>
 
-        <!-- Palworld Banner unten -->
         <div class="pal-card">
             <div>
                 <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Game Server</div>
@@ -340,18 +299,24 @@
             });
             if (response.ok) {
                 const data = await response.json();
-                document.getElementById('sys-uptime').innerText = data.uptime || 'Aktiv';
-                if(data.memory) {
-                    document.getElementById('sys-ram').innerText = data.memory.percent + '%';
-                }
+                
+                // Statische/Dynamische Zuweisung
+                document.getElementById('sys-uptime').innerText = data.uptime || '-';
+                document.getElementById('sys-load').innerText = data.load !== undefined ? data.load : '-';
+                document.getElementById('sys-ram').innerText = data.memory ? (data.memory.percent + '%') : '-';
+                document.getElementById('sys-disk').innerText = data.disk ? (data.disk.percent + '%') : '-';
+                document.getElementById('sys-temp').innerText = data.temp ? (data.temp + ' °C') : '-';
+                document.getElementById('sys-procs').innerText = data.processes !== undefined ? data.processes : '-';
+                document.getElementById('sys-users').innerText = data.users !== undefined ? data.users : '-';
             }
         } catch (e) {
-            console.log('API offline:', e);
+            console.log('API nicht erreichbar:', e);
+            document.getElementById('server-status').innerText = 'API Offline';
         }
     }
 
     fetchServerStats();
-    setInterval(fetchServerStats, 15000);
+    setInterval(fetchServerStats, 10000);
 </script>
 
 </body>
