@@ -300,7 +300,6 @@
             if (response.ok) {
                 const data = await response.json();
                 
-                // Statische/Dynamische Zuweisung
                 document.getElementById('sys-uptime').innerText = data.uptime || '-';
                 document.getElementById('sys-load').innerText = data.load !== undefined ? data.load : '-';
                 document.getElementById('sys-ram').innerText = data.memory ? (data.memory.percent + '%') : '-';
