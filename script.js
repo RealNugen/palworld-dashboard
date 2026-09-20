@@ -1,54 +1,59 @@
-// Funktion zum Abrufen der Server-Daten von der Flask-API
-async function fetchStats() {
-  const statusText = document.getElementById('status-text');
-  try {
-    const response = await fetch('https://enviably-saturday-barrette.ngrok-free.dev/api/stats', {
-      headers: { 'ngrok-skip-browser-warning': 'true' }
-    });
-    if (!response.ok) throw new Error('Network error');
-    const data = await response.json();
-
-    if (document.getElementById('uptime')) document.getElementById('uptime').innerText = data.uptime || '--';
-    if (document.getElementById('load')) document.getElementById('load').innerText = data.load || '--';
-    if (document.getElementById('disk')) document.getElementById('disk').innerText = data.disk || '--';
-    if (document.getElementById('memory')) document.getElementById('memory').innerText = data.memory || '--';
-    if (document.getElementById('temp')) document.getElementById('temp').innerText = data.temp ? `${data.temp} °C` : '-- °C';
-    if (document.getElementById('processes')) document.getElementById('processes').innerText = data.processes || '--';
-
-    if (statusText) {
-      statusText.innerText = 'PS C:\\SYSTEM> ONLINE';
-      statusText.style.color = '#00ff66';
+// Function to fetch telemetry data from the Flask API via Cloudflare Tunnel
+async function fetchSystemStats() {
+    try {
+        const response = await fetch('https://api.nugen.cc/api/stats');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        updateDashboardUI(data);
+    } catch (error) {
+        console.error('Error fetching system stats:', error);
+        showOfflineStatus();
     }
-  } catch (error) {
-    if (statusText) {
-      statusText.innerText = 'PS C:\\SYSTEM> OFFLINE';
-      statusText.style.color = '#ff3333';
-    }
-  }
 }
 
-function copyToClipboard(text, element) {
-  navigator.clipboard.writeText(text).then(() => {
-    const hint = element.querySelector('.copy-hint');
-    if (hint) hint.innerText = 'Kopiert!';
-    element.classList.add('copied');
-    setTimeout(() => {
-      if (hint) hint.innerText = 'Kopieren';
-      element.classList.remove('copied');
-    }, 2000);
-  });
+// Function to update UI elements with telemetry data
+function updateDashboardUI(data) {
+    // Uptime
+    if (data.uptime) {
+        document.getElementById('uptime-value').innerText = data.uptime;
+    }
+
+    // CPU Load
+    if (data.cpu_load !== undefined) {
+        document.getElementById('cpu-value').innerText = `${data.cpu_load}%`;
+    }
+
+    // RAM Usage
+    if (data.memory) {
+        document.getElementById('ram-value').innerText = `${data.memory.used_gb} / ${data.memory.total_gb} GB (${data.memory.percent}%)`;
+    }
+
+    // Disk Usage
+    if (data.disk) {
+        document.getElementById('disk-value').innerText = `${data.disk.used_gb} / ${data.disk.total_gb} GB (${data.disk.percent}%)`;
+    }
+
+    // CPU Temperature
+    if (data.temperature !== undefined) {
+        document.getElementById('temp-value').innerText = `${data.temperature} °C`;
+    }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const menuBtn = document.getElementById('menu-btn');
-  const menuBox = document.getElementById('menu-box');
+// Function to handle connection errors visually
+function showOfflineStatus() {
+    const offlineText = 'Offline / Error';
+    document.getElementById('cpu-value').innerText = offlineText;
+    document.getElementById('ram-value').innerText = offlineText;
+    document.getElementById('disk-value').innerText = offlineText;
+    document.getElementById('temp-value').innerText = offlineText;
+}
 
-  if (menuBtn && menuBox) {
-    menuBtn.addEventListener('click', () => {
-      menuBox.classList.toggle('hidden');
-    });
-  }
+// Auto-refresh stats every 5 seconds
+setInterval(fetchSystemStats, 5000);
 
-  fetchStats();
-  setInterval(fetchStats, 5000);
-});
+// Initial fetch on page load
+fetchSystemStats();
