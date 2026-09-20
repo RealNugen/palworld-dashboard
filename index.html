@@ -1,68 +1,21 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nugens Server Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <header>
-    <h1>NUGENS SERVER</h1>
-    <button id="menu-btn">≡ MENU</button>
-  </header>
-
-  <!-- Das Klappmenü für Palworld -->
-  <div id="menu-box" class="server-info-box hidden">
-    <h3>PALWORLD SERVER INFO</h3>
-    <p>Klicke auf die Adresse zum Kopieren:</p>
-    <div class="copy-address" onclick="copyToClipboard('realnugen.duckdns.org:8211', this)">
-      <code>realnugen.duckdns.org:8211</code>
-      <span class="copy-hint">Kopieren</span>
-    </div>
-  </div>
-
-  <main>
-    <div class="card">
-      <div class="card-header">
-        <span id="status-text">PS C:\SYSTEM> CONNECTING...</span>
-        <span class="badge">• LIVE</span>
-      </div>
-      <div class="metrics">
-        <div><label>SYSTEM UPTIME</label><p id="uptime">--</p></div>
-        <div><label>SYSTEM LOAD</label><p id="load">--</p></div>
-        <div><label>DISK USAGE (/)</label><p id="disk">--</p></div>
-        <div><label>MEMORY USAGE</label><p id="memory">--</p></div>
-        <div><label>TEMPERATURE</label><p id="temp">-- °C</p></div>
-        <div><label>PROCESSES</label><p id="processes">--</p></div>
-      </div>
-      <div class="footer-info">
-        Users logged in: <span id="users-logged">0</span><br>
-        IPv4 address (wlp3s0): 192.168.178.35
-      </div>
-    </div>
-  </main>
-
-  <script src="script.js?v=2"></script>
-</body>
-</html><!DOCTYPE html>
-<html lang="de">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HomeOS — Server Hub</title>
+    <title>HomeOS Hub</title>
     <style>
         :root {
             --bg-color: #000000;
+            --sidebar-bg: rgba(255, 255, 255, 0.05);
             --card-bg: rgba(255, 255, 255, 0.07);
             --card-border: rgba(255, 255, 255, 0.12);
-            --card-hover: rgba(255, 255, 255, 0.12);
+            --card-hover: rgba(255, 255, 255, 0.14);
             --text-primary: #f5f5f7;
             --text-secondary: #86868b;
             --accent-blue: #2997ff;
             --accent-green: #30d158;
-            --accent-red: #ff453a;
-            --blur-amount: 20px;
+            --blur-amount: 30px;
         }
 
         * {
@@ -75,291 +28,309 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             background-image: 
-                radial-gradient(at 0% 0%, rgba(41, 151, 255, 0.15) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(48, 209, 88, 0.1) 0px, transparent 50%);
+                radial-gradient(at 0% 0%, rgba(41, 151, 255, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(48, 209, 88, 0.08) 0px, transparent 50%);
             background-attachment: fixed;
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
-            padding: 2rem 1rem;
+            padding: 2rem;
             -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            max-width: 1000px;
+        /* Main Shell Layout */
+        .app-shell {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 1.5rem;
+            max-width: 1100px;
             width: 100%;
-        }
-
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2.5rem;
-            padding: 1rem 1.5rem;
-            background: var(--card-bg);
+            min-height: 620px;
+            background: rgba(20, 20, 22, 0.6);
             backdrop-filter: blur(var(--blur-amount));
             -webkit-backdrop-filter: blur(var(--blur-amount));
             border: 1px solid var(--card-border);
-            border-radius: 18px;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
 
-        .header-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            letter-spacing: -0.01em;
+        /* Sidebar Links */
+        .sidebar {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--card-border);
+            padding: 2rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        .server-badge {
+        .brand {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 2rem;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
+            gap: 10px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(48, 209, 88, 0.15);
+            border: 1px solid rgba(48, 209, 88, 0.3);
+            color: var(--accent-green);
+            padding: 0.3rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background-color: var(--accent-green);
-            box-shadow: 0 0 10px var(--accent-green);
+            box-shadow: 0 0 8px var(--accent-green);
         }
 
-        /* Section Titles */
-        .section-title {
-            font-size: 0.875rem;
+        .sidebar-section {
+            margin-top: 1.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.08em;
             color: var(--text-secondary);
-            margin-bottom: 1rem;
-            margin-left: 0.5rem;
+            margin-bottom: 0.75rem;
             font-weight: 600;
         }
 
-        /* Grid Services */
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            font-size: 0.85rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            color: var(--text-primary);
+            font-weight: 500;
+            font-family: SFMono-Regular, Consolas, monospace;
+        }
+
+        /* Main Content Rechts */
+        .content {
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .section-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        /* Services Grid */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(var(--blur-amount));
-            -webkit-backdrop-filter: blur(var(--blur-amount));
             border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 1.5rem;
+            border-radius: 16px;
+            padding: 1.25rem;
             text-decoration: none;
             color: inherit;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.2s ease;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            position: relative;
-            overflow: hidden;
+            gap: 0.75rem;
         }
 
         .card:hover {
             background: var(--card-hover);
-            transform: translateY(-4px);
+            transform: translateY(-3px);
             border-color: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
         }
 
         .card-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
+            font-size: 1.8rem;
         }
 
         .card-title {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 0.25rem;
         }
 
         .card-sub {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
         }
 
-        /* Info Cards & Palworld Widget */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .info-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(var(--blur-amount));
-            -webkit-backdrop-filter: blur(var(--blur-amount));
+        /* Palworld Banner / Card */
+        .pal-card {
+            background: linear-gradient(135deg, rgba(41, 151, 255, 0.1), rgba(255, 255, 255, 0.03));
             border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 1.5rem;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
-        }
-
-        .stat-row:last-child {
-            border-bottom: none;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-        }
-
-        .stat-val {
-            font-weight: 500;
-            font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
-        }
-
-        /* Address Copy Box */
-        .copy-box {
-            background: rgba(41, 151, 255, 0.1);
-            border: 1px solid rgba(41, 151, 255, 0.3);
-            color: var(--accent-blue);
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
-            font-family: SFMono-Regular, Consolas, monospace;
-            font-size: 0.9rem;
+            border-radius: 18px;
+            padding: 1.25rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .copy-btn {
+            background: rgba(41, 151, 255, 0.2);
+            border: 1px solid rgba(41, 151, 255, 0.4);
+            color: var(--accent-blue);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-family: SFMono-Regular, Consolas, monospace;
+            font-size: 0.85rem;
             cursor: pointer;
-            margin-top: 1rem;
             transition: background 0.2s;
         }
 
-        .copy-box:hover {
-            background: rgba(41, 151, 255, 0.2);
+        .copy-btn:hover {
+            background: rgba(41, 151, 255, 0.35);
         }
 
-        /* Footer */
-        footer {
-            margin-top: auto;
-            padding-top: 3rem;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            text-align: center;
+        /* Responsive Breakpoint */
+        @media (max-width: 768px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--card-border);
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <div class="header-title">HomeOS Hub</div>
-        <div class="server-badge">
-            <span class="status-dot" id="server-status-dot"></span>
-            <span id="server-status-text">Ubuntu Server Online</span>
-        </div>
-    </header>
-
-    <div class="section-title">Dienste & Anwendungen</div>
-    <div class="grid">
-        <!-- Pi-hole -->
-        <a href="http://192.168.178.35:8088/admin" target="_blank" class="card">
-            <div class="card-icon">🛡️</div>
-            <div>
-                <div class="card-title">Pi-hole v6</div>
-                <div class="card-sub">DNS & AdBlocker</div>
-            </div>
-        </a>
-
-        <!-- Vaultwarden -->
-        <a href="https://enviably-saturday-barrette.ngrok-free.dev" target="_blank" class="card">
-            <div class="card-icon">🔑</div>
-            <div>
-                <div class="card-title">Vaultwarden</div>
-                <div class="card-sub">Passwort Manager</div>
-            </div>
-        </a>
-
-        <!-- Uptime Kuma -->
-        <a href="http://192.168.178.35:3001" target="_blank" class="card">
-            <div class="card-icon">📊</div>
-            <div>
-                <div class="card-title">Uptime Kuma</div>
-                <div class="card-sub">Service Monitoring</div>
-            </div>
-        </a>
-
-        <!-- Palworld Dashboard -->
-        <a href="#palworld" class="card">
-            <div class="card-icon">🎮</div>
-            <div>
-                <div class="card-title">Palworld Server</div>
-                <div class="card-sub">Port 8211 UDP</div>
-            </div>
-        </a>
-    </div>
-
-    <div class="section-title">Server Status & Informationen</div>
-    <div class="info-grid">
-        <!-- Palworld Server Status -->
-        <div class="info-card" id="palworld">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Palworld Dedicated</h3>
-            <div class="stat-row">
-                <span class="stat-label">Status</span>
-                <span class="stat-val" id="pal-status" style="color: var(--accent-green);">Online</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Uptime</span>
-                <span class="stat-val" id="sys-uptime">-</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">RAM Auslastung</span>
-                <span class="stat-val" id="sys-ram">-</span>
+<div class="app-shell">
+    <!-- Links: Sidebar -->
+    <div class="sidebar">
+        <div>
+            <div class="brand">
+                <span> HomeOS</span>
             </div>
 
-            <div class="copy-box" onclick="copyAddress('realnugen.duckdns.org:8211')">
-                <span>realnugen.duckdns.org:8211</span>
-                <span>📋</span>
+            <div style="margin-bottom: 1.5rem;">
+                <div class="status-pill">
+                    <span class="status-dot"></span>
+                    <span>Server Online</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">System Status</div>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span>Uptime</span>
+                        <span class="info-value" id="sys-uptime">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span>RAM</span>
+                        <span class="info-value" id="sys-ram">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Netzwerk</div>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span>IP</span>
+                        <span class="info-value">192.168.178.35</span>
+                    </div>
+                    <div class="info-item">
+                        <span>DNS</span>
+                        <span class="info-value">Pi-hole v6</span>
+                    </div>
+                    <div class="info-item">
+                        <span>Backups</span>
+                        <span class="info-value">Aktiv (20:00)</span>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Infrastructure Config -->
-        <div class="info-card">
-            <h3 style="margin-bottom: 1rem; font-size: 1.1rem;">Infrastruktur</h3>
-            <div class="stat-row">
-                <span class="stat-label">Lokale IP</span>
-                <span class="stat-val">192.168.178.35</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Anschluss</span>
-                <span class="stat-val">Native Dual-Stack</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">DynDNS Sync</span>
-                <span class="stat-val">DuckDNS (5m)</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Backups</span>
-                <span class="stat-val">Täglich (Restic SCP)</span>
-            </div>
+        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2rem;">
+            Ubuntu 24.04 LTS
         </div>
     </div>
 
-    <footer>
-        Ubuntu Server 24.04 LTS • Managed via Termius & Docker
-    </footer>
+    <!-- Rechts: Haupt-Anwendungen -->
+    <div class="content">
+        <div>
+            <div class="section-header">Dienste & Control Panel</div>
+            <div class="grid">
+                <!-- Pi-hole -->
+                <a href="http://192.168.178.35:8088/admin" target="_blank" class="card">
+                    <div class="card-icon">🛡️</div>
+                    <div>
+                        <div class="card-title">Pi-hole</div>
+                        <div class="card-sub">DNS & Werbefilter</div>
+                    </div>
+                </a>
+
+                <!-- Vaultwarden -->
+                <a href="https://enviably-saturday-barrette.ngrok-free.dev" target="_blank" class="card">
+                    <div class="card-icon">🔑</div>
+                    <div>
+                        <div class="card-title">Vaultwarden</div>
+                        <div class="card-sub">Passwörter</div>
+                    </div>
+                </a>
+
+                <!-- Uptime Kuma -->
+                <a href="http://192.168.178.35:3001" target="_blank" class="card">
+                    <div class="card-icon">📊</div>
+                    <div>
+                        <div class="card-title">Uptime Kuma</div>
+                        <div class="card-sub">Monitoring</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Palworld Banner unten -->
+        <div class="pal-card">
+            <div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Game Server</div>
+                <div style="font-size: 1.1rem; font-weight: 600;">Palworld Dedicated Server</div>
+            </div>
+            <button class="copy-btn" onclick="copyAddress('realnugen.duckdns.org:8211')">
+                📋 realnugen.duckdns.org:8211
+            </button>
+        </div>
+    </div>
 </div>
 
 <script>
     function copyAddress(text) {
         navigator.clipboard.writeText(text);
-        alert('Adresse ' + text + ' in die Zwischenablage kopiert!');
+        alert('Server-Adresse kopiert: ' + text);
     }
 
     async function fetchServerStats() {
@@ -375,7 +346,7 @@
                 }
             }
         } catch (e) {
-            console.log('API nicht erreichbar:', e);
+            console.log('API offline:', e);
         }
     }
 
