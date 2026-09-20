@@ -42,7 +42,7 @@
 
         .app-shell {
             display: grid;
-            grid-template-columns: 300px 1fr;
+            grid-template-columns: 320px 1fr;
             gap: 1.5rem;
             max-width: 1150px;
             width: 100%;
@@ -117,12 +117,14 @@
             display: flex;
             justify-content: space-between;
             color: var(--text-secondary);
+            gap: 1rem;
         }
 
         .info-value {
             color: var(--text-primary);
             font-weight: 500;
             font-family: SFMono-Regular, Consolas, monospace;
+            text-align: right;
         }
 
         .content {
@@ -292,6 +294,14 @@
         alert('Server-Adresse kopiert: ' + text);
     }
 
+    function formatVal(val) {
+        if (!val && val !== 0) return '-';
+        if (typeof val === 'object' && val !== null) {
+            return val.percent !== undefined ? (val.percent + '%') : JSON.stringify(val);
+        }
+        return val;
+    }
+
     async function fetchServerStats() {
         try {
             const response = await fetch('https://enviably-saturday-barrette.ngrok-free.dev/api/stats', {
@@ -300,13 +310,13 @@
             if (response.ok) {
                 const data = await response.json();
                 
-                document.getElementById('sys-uptime').innerText = data.uptime || '-';
-                document.getElementById('sys-load').innerText = data.load !== undefined ? data.load : '-';
-                document.getElementById('sys-ram').innerText = data.memory ? (data.memory.percent + '%') : '-';
-                document.getElementById('sys-disk').innerText = data.disk ? (data.disk.percent + '%') : '-';
+                document.getElementById('sys-uptime').innerText = formatVal(data.uptime);
+                document.getElementById('sys-load').innerText = formatVal(data.load);
+                document.getElementById('sys-ram').innerText = formatVal(data.memory);
+                document.getElementById('sys-disk').innerText = formatVal(data.disk);
                 document.getElementById('sys-temp').innerText = data.temp ? (data.temp + ' °C') : '-';
-                document.getElementById('sys-procs').innerText = data.processes !== undefined ? data.processes : '-';
-                document.getElementById('sys-users').innerText = data.users !== undefined ? data.users : '-';
+                document.getElementById('sys-procs').innerText = formatVal(data.processes);
+                document.getElementById('sys-users').innerText = formatVal(data.users);
             }
         } catch (e) {
             console.log('API nicht erreichbar:', e);
