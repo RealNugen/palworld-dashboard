@@ -304,9 +304,8 @@
 
     async function fetchServerStats() {
         try {
-            const response = await fetch('https://api.nugen.cc/api/stats', {
-                headers: { 'ngrok-skip-browser-warning': 'true' }
-            });
+            const response = await fetch('https://api.nugen.cc/api/stats');
+
             if (response.ok) {
                 const data = await response.json();
                 
