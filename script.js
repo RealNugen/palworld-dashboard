@@ -19,7 +19,11 @@ async function fetchSystemStats() {
 function updateDashboardUI(data) {
     // Uptime
     if (data.uptime) {
-        document.getElementById('uptime-value').innerText = data.uptime;
+        if (typeof data.uptime === 'object') {
+            document.getElementById('uptime-value').innerText = data.uptime.formatted || `${data.uptime.days}d ${data.uptime.hours}h ${data.uptime.minutes}m`;
+        } else {
+            document.getElementById('uptime-value').innerText = data.uptime;
+        }
     }
 
     // CPU Load
