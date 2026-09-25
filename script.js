@@ -1,75 +1,83 @@
-// Function to fetch telemetry data from the Flask API via Cloudflare Tunnel
-async function fetchSystemStats() {
-    try {
-        const response = await fetch('https://api.nugen.cc/api/stats');
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        updateDashboardUI(data);
-    } catch (error) {
-        console.error('Error fetching system stats:', error);
-        showOfflineStatus();
-    }
-}
-
 // Function to update UI elements with telemetry data
 function updateDashboardUI(data) {
-    // Uptime
-    if (data.uptime) {
+    if (!data) return;
+
+    // 1. Uptime
+    const uptimeElement = document.getElementById('uptime');
+    if (uptimeElement && data.uptime) {
         let uptimeData = data.uptime;
         
-        // Falls das Backend die Uptime als JSON-String sendet, parsen wir sie zuerst
+        // Falls das Backend die Uptime als JSON-String liefert, zuerst parsen
         if (typeof uptimeData === 'string') {
             try {
                 uptimeData = JSON.parse(uptimeData);
             } catch (e) {
-                // Falls es ein normaler Text-String ist, belassen wir ihn so
+                // Falls es ein einfacher String ist
             }
         }
 
-        // Jetzt greifen wir sicher auf die Daten zu
+        // Wenn es ein Objekt ist, nutze das "formatted"-Feld oder baue den String selbst zusammen
         if (typeof uptimeData === 'object' && uptimeData !== null) {
-            document.getElementById('uptime-value').innerText = uptimeData.formatted || `${uptimeData.days}d ${uptimeData.hours}h ${uptimeData.minutes}m`;
+            if (uptimeData.formatted) {
+                uptimeElement.innerText = uptimeData.formatted;
+            } else if (uptimeData.days !== undefined) {
+                uptimeElement.innerText = `${uptimeData.days}d ${uptimeData.hours || 0}h ${uptimeData.minutes || 0}m`;
+            } else {
+                uptimeElement.innerText = JSON.stringify(uptimeData);
+            }
         } else {
-            document.getElementById('uptime-value').innerText = uptimeData;
+            uptimeElement.innerText = uptimeData;
         }
     }
 
-    // CPU Load
-    if (data.cpu_load !== undefined) {
-        document.getElementById('cpu-value').innerText = `${data.cpu_load}%`;
+    // 2. CPU Load / System Load
+    const loadElement = document.getElementById('cpu-value') || document.getElementById('cpu') || document.getElementById('load');
+    const loadValue = data.cpu_load ?? data.load ?? data.load_avg;
+    if (loadElement) {
+        if (loadValue !== undefined && loadValue !== null) {
+            loadElement.innerText = typeof loadValue === 'number' ? `${loadValue}%` : loadValue;
+        } else {
+            loadElement.innerText = '-';
+        }
     }
 
-    // RAM Usage
-    if (data.memory) {
-        document.getElementById('ram-value').innerText = `${data.memory.used_gb} / ${data.memory.total_gb} GB (${data.memory.percent}%)`;
+    // 3. RAM Usage
+    const ramElement = document.getElementById('ram-value') || document.getElementById('ram') || document.getElementById('memory');
+    if (ramElement && data.memory) {
+        if (typeof data.memory === 'object') {
+            const used = data.memory.used_gb ?? '-';
+            const total = data.memory.total_gb ?? '-';
+            const percent = data.memory.percent ?? data.memory;
+            ramElement.innerText = (data.memory.used_gb && data.memory.total_gb) 
+                ? `${used} / ${total} GB (${percent}%)` 
+                : `${percent}%`;
+        } else {
+            ramElement.innerText = `${data.memory}%`;
+        }
     }
 
-    // Disk Usage
-    if (data.disk) {
-        document.getElementById('disk-value').innerText = `${data.disk.used_gb} / ${data.disk.total_gb} GB (${data.disk.percent}%)`;
+    // 4. Disk Usage
+    const diskElement = document.getElementById('disk-value') || document.getElementById('disk');
+    if (diskElement && data.disk) {
+        if (typeof data.disk === 'object') {
+            const used = data.disk.used_gb ?? '-';
+            const total = data.disk.total_gb ?? '-';
+            const percent = data.disk.percent ?? data.disk;
+            diskElement.innerText = (data.disk.used_gb && data.disk.total_gb) 
+                ? `${used} / ${total} GB (${percent}%)` 
+                : `${percent}%`;
+        } else {
+            diskElement.innerText = `${data.disk}%`;
+        }
     }
 
-    // CPU Temperature
-    if (data.temperature !== undefined) {
-        document.getElementById('temp-value').innerText = `${data.temperature} °C`;
+    // 5. CPU Temperature
+    const tempElement = document.getElementById('temp-value') || document.getElementById('temp') || document.getElementById('temperature');
+    if (tempElement) {
+        if (data.temperature !== undefined && data.temperature !== null && data.temperature !== '-') {
+            tempElement.innerText = `${data.temperature} °C`;
+        } else {
+            tempElement.innerText = '-';
+        }
     }
 }
-
-// Function to handle connection errors visually
-function showOfflineStatus() {
-    const offlineText = 'Offline / Error';
-    document.getElementById('cpu-value').innerText = offlineText;
-    document.getElementById('ram-value').innerText = offlineText;
-    document.getElementById('disk-value').innerText = offlineText;
-    document.getElementById('temp-value').innerText = offlineText;
-}
-
-// Auto-refresh stats every 5 seconds
-setInterval(fetchSystemStats, 5000);
-
-// Initial fetch on page load
-fetchSystemStats();
