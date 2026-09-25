@@ -19,10 +19,22 @@ async function fetchSystemStats() {
 function updateDashboardUI(data) {
     // Uptime
     if (data.uptime) {
-        if (typeof data.uptime === 'object') {
-            document.getElementById('uptime-value').innerText = data.uptime.formatted || `${data.uptime.days}d ${data.uptime.hours}h ${data.uptime.minutes}m`;
+        let uptimeData = data.uptime;
+        
+        // Falls das Backend die Uptime als JSON-String sendet, parsen wir sie zuerst
+        if (typeof uptimeData === 'string') {
+            try {
+                uptimeData = JSON.parse(uptimeData);
+            } catch (e) {
+                // Falls es ein normaler Text-String ist, belassen wir ihn so
+            }
+        }
+
+        // Jetzt greifen wir sicher auf die Daten zu
+        if (typeof uptimeData === 'object' && uptimeData !== null) {
+            document.getElementById('uptime-value').innerText = uptimeData.formatted || `${uptimeData.days}d ${uptimeData.hours}h ${uptimeData.minutes}m`;
         } else {
-            document.getElementById('uptime-value').innerText = data.uptime;
+            document.getElementById('uptime-value').innerText = uptimeData;
         }
     }
 
